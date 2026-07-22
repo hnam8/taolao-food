@@ -1,0 +1,11 @@
+# Config chứa credentials nhạy cảm nếu sau này đổi khác default XAMPP
+config.local.php
+
+# OS/editor junk
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Log files nếu có
+*.log
