@@ -1,0 +1,428 @@
+/* =========================================================
+   TaoLao Food — style.css
+   Design concept: "Quán ăn vỉa hè về đêm" (night street-food stall)
+   Signature element: giỏ hàng dạng "phiếu order" giấy, viền răng cưa
+   ========================================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;800;900&display=swap');
+
+/* ---------- 1. DESIGN TOKENS ---------- */
+:root {
+    /* Palette: lacquer red, lantern amber, charcoal night, paper cream */
+    --color-charcoal:      #211C18;
+    --color-charcoal-alt:  #2B2320;
+    --color-charcoal-soft: #362C26;
+    --color-paper:         #FBF3E4;
+    --color-paper-dim:     #F0E6D2;
+    --color-lacquer:       #C23B2B;
+    --color-lacquer-dark:  #9E2E20;
+    --color-amber:         #F2A93B;
+    --color-jade:          #3F7A63;
+    --color-ink:           #2A211B;
+    --color-cream-text:    #F4EDE4;
+    --color-cream-muted:   #C9BCAC;
+
+    --font-display: 'Be Vietnam Pro', sans-serif;
+    --font-body:    'Be Vietnam Pro', sans-serif;
+
+    --radius-card: 10px;
+    --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.35);
+    --shadow-paper: 0 8px 20px rgba(0, 0, 0, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        transition-duration: 0.001ms !important;
+    }
+}
+
+/* ---------- 2. RESET & BASE ---------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: var(--font-body);
+    background-color: var(--color-charcoal);
+    background-image:
+        radial-gradient(circle at 15% 10%, rgba(242, 169, 59, 0.08), transparent 40%),
+        radial-gradient(circle at 85% 30%, rgba(194, 59, 43, 0.10), transparent 45%);
+    color: var(--color-cream-text);
+    line-height: 1.5;
+    min-height: 100vh;
+}
+
+img { max-width: 100%; display: block; }
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+}
+
+button:focus-visible,
+input:focus-visible {
+    outline: 3px solid var(--color-amber);
+    outline-offset: 2px;
+}
+
+/* ---------- 3. HEADER (biển hiệu quán ăn) ---------- */
+.site-header {
+    position: relative;
+    text-align: center;
+    padding: 2.75rem 1.5rem 2.25rem;
+    background: linear-gradient(180deg, var(--color-charcoal-alt) 0%, var(--color-charcoal) 100%);
+    border-bottom: 3px solid var(--color-lacquer);
+    overflow: hidden;
+}
+
+/* Dãy đèn lồng trang trí phía trên header */
+.site-header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background-image: radial-gradient(circle, var(--color-amber) 3px, transparent 3.5px);
+    background-size: 28px 10px;
+    background-position: center;
+    opacity: 0.75;
+    animation: glow 3.2s ease-in-out infinite;
+}
+
+@keyframes glow {
+    0%, 100% { opacity: 0.55; }
+    50%      { opacity: 0.9; }
+}
+
+.site-header h1 {
+    font-family: var(--font-display);
+    font-weight: 900;
+    font-size: clamp(2rem, 5vw, 3rem);
+    letter-spacing: 0.02em;
+    color: var(--color-amber);
+    text-shadow: 0 0 18px rgba(242, 169, 59, 0.35);
+}
+
+.site-header p {
+    margin-top: 0.4rem;
+    font-weight: 500;
+    color: var(--color-cream-muted);
+    font-style: italic;
+    letter-spacing: 0.02em;
+}
+
+/* ---------- 4. LAYOUT ---------- */
+.container {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 4rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+}
+
+@media (min-width: 900px) {
+    .container {
+        grid-template-columns: 2.1fr 1fr;
+        align-items: start;
+    }
+}
+
+#menu-section h2,
+#cart-section h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.35rem;
+    color: var(--color-cream-text);
+    margin-bottom: 1.25rem;
+    position: relative;
+    display: inline-block;
+    padding-bottom: 0.35rem;
+}
+
+#menu-section h2::after,
+#cart-section h2::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 42px;
+    height: 3px;
+    background: var(--color-lacquer);
+    border-radius: 2px;
+}
+
+/* ---------- 5. MENU GRID ---------- */
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 1.25rem;
+}
+
+.menu-item-card {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.menu-item-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45);
+}
+
+.menu-item-card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+    background: var(--color-paper-dim);
+    border-bottom: 3px solid var(--color-lacquer);
+}
+
+.menu-item-card h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.05rem;
+    margin: 0.85rem 0.9rem 0.25rem;
+}
+
+.item-desc {
+    font-size: 0.85rem;
+    color: #6b5f52;
+    margin: 0 0.9rem 0.6rem;
+    flex-grow: 1;
+}
+
+.item-price {
+    font-weight: 800;
+    color: var(--color-lacquer-dark);
+    margin: 0 0.9rem 0.8rem;
+    font-size: 1.05rem;
+}
+
+.add-to-cart-btn {
+    margin: 0 0.9rem 0.9rem;
+    padding: 0.6rem 1rem;
+    background: var(--color-lacquer);
+    color: var(--color-paper);
+    font-weight: 700;
+    font-size: 0.9rem;
+    border-radius: 6px;
+    letter-spacing: 0.01em;
+    transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.add-to-cart-btn:hover  { background: var(--color-lacquer-dark); }
+.add-to-cart-btn:active { transform: scale(0.97); }
+
+.loading-text, .error-text {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: var(--color-cream-muted);
+    padding: 2rem 0;
+}
+.error-text { color: #E8968A; }
+
+/* ---------- 6. CART = "PHIẾU ORDER" (signature element) ---------- */
+#cart-section {
+    position: sticky;
+    top: 1.5rem;
+}
+
+.cart-box {
+    position: relative;
+    background: var(--color-paper);
+    color: var(--color-ink);
+    padding: 1.6rem 1.4rem 1.8rem;
+    border-radius: 4px;
+    box-shadow: var(--shadow-paper);
+    transform: rotate(-0.6deg);
+    /* Viền răng cưa phía dưới, như xé từ cuộn giấy order */
+    clip-path: polygon(
+        0% 0%, 100% 0%, 100% 96%,
+        96% 100%, 92% 96%, 88% 100%, 84% 96%, 80% 100%,
+        76% 96%, 72% 100%, 68% 96%, 64% 100%, 60% 96%, 56% 100%,
+        52% 96%, 48% 100%, 44% 96%, 40% 100%, 36% 96%, 32% 100%,
+        28% 96%, 24% 100%, 20% 96%, 16% 100%, 12% 96%, 8% 100%,
+        4% 96%, 0% 100%
+    );
+}
+
+/* "Băng dán" góc trên giỏ hàng */
+.cart-box::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    width: 70px;
+    height: 22px;
+    background: rgba(242, 169, 59, 0.55);
+    border: 1px solid rgba(255,255,255,0.3);
+    transform: translateX(-50%) rotate(-2deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+}
+
+#cart-section.cart-box h2 {
+    color: var(--color-lacquer); /* Đổi sang màu đỏ sơn mài */
+    font-weight: 900;            /* Tăng độ đậm (bold) lên mức tối đa để chữ dày hơn */
+    -webkit-text-fill-color: var(--color-lacquer); /* Cập nhật lại màu để tránh trình duyệt cache */
+    letter-spacing: 0.02em;      /* Kéo giãn khoảng cách giữa các chữ cái một chút */
+}
+.cart-box h2::after { background: var(--color-lacquer); }
+
+#cart-items {
+    border-top: 1px dashed #B9AA95;
+    padding-top: 0.75rem;
+    margin-top: 0.5rem;
+    min-height: 40px;
+}
+
+.empty-cart-text {
+    color: #8A7B69;
+    font-style: italic;
+    text-align: center;
+    padding: 1rem 0;
+}
+
+.cart-row {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px dashed #D9CDB8;
+    font-size: 0.92rem;
+}
+
+.cart-item-name { font-weight: 600; }
+
+.cart-qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.qty-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-charcoal);
+    color: var(--color-amber);
+    font-weight: 800;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.qty-btn:hover { background: var(--color-lacquer); color: var(--color-paper); }
+
+.cart-item-subtotal {
+    font-weight: 700;
+    color: var(--color-lacquer-dark);
+    min-width: 70px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.cart-total {
+    border-top: 2px solid var(--color-ink);
+    margin-top: 0.9rem;
+    padding-top: 0.75rem;
+    text-align: right;
+    font-size: 1.1rem;
+}
+
+.cart-total span { color: var(--color-lacquer-dark); }
+
+/* ---------- 7. CHECKOUT FORM ---------- */
+.checkout-form {
+    margin-top: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
+.checkout-form label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #6b5f52;
+}
+
+.checkout-form input {
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #C9BCAA;
+    border-radius: 6px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: var(--color-ink);
+}
+
+#checkout-btn {
+    margin-top: 0.3rem;
+    padding: 0.75rem 1rem;
+    background: var(--color-jade);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    letter-spacing: 0.02em;
+    border-radius: 6px;
+    transition: background 0.15s ease, opacity 0.15s ease, transform 0.1s ease;
+}
+
+#checkout-btn:hover:not(:disabled) { background: #326654; }
+#checkout-btn:active:not(:disabled) { transform: scale(0.98); }
+
+#checkout-btn:disabled {
+    background: #B8AF9F;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#order-message {
+    margin-top: 0.7rem;
+    font-size: 0.88rem;
+    text-align: center;
+    min-height: 1.2em;
+}
+
+.success-text { color: var(--color-jade); font-weight: 700; }
+.error-text   { color: var(--color-lacquer-dark); font-weight: 700; }
+
+/* ---------- 8. FOOTER ---------- */
+.site-footer {
+    text-align: center;
+    padding: 1.5rem;
+    color: var(--color-cream-muted);
+    font-size: 0.8rem;
+    border-top: 1px solid var(--color-charcoal-soft);
+}
+
+/* ---------- 9. RESPONSIVE (NFR-3) ---------- */
+@media (max-width: 899px) {
+    #cart-section {
+        position: static;
+    }
+    .cart-box {
+        transform: none; /* tránh nghiêng gây khó đọc trên mobile hẹp */
+    }
+}
+
+@media (max-width: 480px) {
+    .site-header h1 { font-size: 1.7rem; }
+    .menu-grid { grid-template-columns: 1fr 1fr; gap: 0.85rem; }
+    .menu-item-card img { height: 100px; }
+    .cart-row {
+        grid-template-columns: 1fr auto;
+        row-gap: 0.3rem;
+    }
+    .cart-item-subtotal {
+        grid-column: 1 / -1;
+        text-align: left;
+    }
+}

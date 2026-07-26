@@ -1,0 +1,151 @@
+/* =========================================================
+   css/auth.css — Login / Register pages
+   Kế thừa design tokens từ style.css (đã @import trước file này)
+   ========================================================= */
+
+.auth-body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--color-charcoal);
+    background-image:
+        radial-gradient(circle at 20% 20%, rgba(242, 169, 59, 0.10), transparent 45%),
+        radial-gradient(circle at 80% 80%, rgba(194, 59, 43, 0.12), transparent 45%);
+    padding: 2rem 1rem;
+}
+
+.auth-box {
+    width: 100%;
+    max-width: 380px;
+    background: var(--color-paper);
+    color: #1A140F;
+    border-radius: var(--radius-card);
+    padding: 2rem 1.75rem;
+    box-shadow: var(--shadow-paper);
+    border-top: 4px solid var(--color-lacquer);
+}
+
+.auth-body-admin .auth-box {
+    border-top-color: var(--color-jade);
+}
+
+.auth-box h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 1.35rem;
+    margin-bottom: 1.4rem;
+    text-align: center;
+    color: #1A140F;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.auth-form label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #4A3E32;
+    margin-top: 0.6rem;
+}
+
+.auth-form input {
+    padding: 0.65rem 0.8rem;
+    border: 1px solid #C9BCAA;
+    border-radius: 6px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    color: #1A140F;
+}
+
+.auth-form input:focus {
+    border-color: var(--color-lacquer);
+}
+
+.auth-form button {
+    margin-top: 1.3rem;
+    padding: 0.75rem;
+    background: var(--color-lacquer);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.95rem;
+    border-radius: 6px;
+    transition: background 0.15s ease;
+}
+
+.auth-form button:hover { background: var(--color-lacquer-dark); }
+
+.auth-body-admin .auth-form button {
+    background: var(--color-jade);
+}
+.auth-body-admin .auth-form button:hover { background: #326654; }
+
+.auth-switch {
+    text-align: center;
+    margin-top: 1.1rem;
+    font-size: 0.88rem;
+    color: #5A4C3E;
+}
+
+.auth-switch a,
+.auth-box .success-text a {
+    color: var(--color-lacquer-dark);
+    font-weight: 700;
+    text-decoration: underline;
+}
+
+.error-list {
+    list-style: none;
+    background: #FBE4E0;
+    border: 1px solid #E8968A;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+}
+.error-list li {
+    color: #9E2E20;
+    font-size: 0.85rem;
+}
+
+.error-text-block {
+    background: #FBE4E0;
+    border: 1px solid #E8968A;
+    color: #9E2E20;
+    border-radius: 6px;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.success-text {
+    text-align: center;
+    color: var(--color-jade);
+    font-weight: 600;
+}
+
+/* ---------- Status bar trên index.php ---------- */
+.auth-status-bar {
+    margin-top: 0.7rem;
+    font-size: 0.82rem;
+    color: var(--color-cream-muted);
+}
+
+.auth-status-bar a {
+    color: var(--color-amber);
+    font-weight: 600;
+    text-decoration: none;
+}
+.auth-status-bar a:hover { text-decoration: underline; }
+
+/* ---------- Logout link trên dashboard admin ---------- */
+.logout-link {
+    font-size: 0.82rem;
+    color: var(--color-cream-muted);
+    text-decoration: none;
+}
+.logout-link:hover { color: var(--color-amber); }
