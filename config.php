@@ -20,3 +20,5 @@ try {
     error_log($e->getMessage());
     die("Database connection failed. Please check config or contact admin.");
 }
+
+

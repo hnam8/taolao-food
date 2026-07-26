@@ -55,14 +55,12 @@ $loggedInUser = current_user();
                 <input type="text" id="customer-name" placeholder="Nhập tên của bạn" maxlength="100"
                     value="<?= $loggedInUser ? htmlspecialchars($loggedInUser['username'], ENT_QUOTES, 'UTF-8') : '' ?>"
                     <?= $loggedInUser ? 'readonly' : '' ?>>
-
                 <label for="customer-phone">Số điện thoại:</label>
                 <input type="tel" id="customer-phone" placeholder="09xxxxxxxx" maxlength="15"
                     pattern="^(0|\+84)[0-9]{9,10}$" required>
 
                 <label for="customer-address">Địa chỉ giao hàng:</label>
                 <textarea id="customer-address" placeholder="Số nhà, đường, phường/xã, quận/huyện" maxlength="255" rows="2" required></textarea>
-
                 <label>Phương thức thanh toán:</label>
                 <div class="payment-methods">
                     <label class="payment-option">
@@ -77,8 +75,7 @@ $loggedInUser = current_user();
                         <input type="radio" name="payment_method" value="qr">
                         <span> Quét mã QR chuyển khoản</span>
                     </label>
-                </div>
-
+                </div>    
                 <button id="checkout-btn" disabled>Đặt hàng</button>
             </div>
             <p id="order-message"></p>

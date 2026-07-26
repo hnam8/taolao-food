@@ -9,15 +9,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../includes/auth_guard.php';
-
-// Bảo vệ endpoint: chỉ admin đã đăng nhập mới gọi được (không chỉ chặn ở dashboard.php,
-// vì API này có thể bị gọi thẳng qua Postman/curl nếu không guard riêng)
-init_session();
-if (!isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
-    http_response_code(403);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-    exit;
-}
+require_role_api('admin');
 
 try {
     // Bước 1: Lấy danh sách đơn hàng (bảng cha), kèm thông tin giao hàng & thanh toán,
@@ -73,3 +65,4 @@ try {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Unable to fetch orders.']);
 }
+

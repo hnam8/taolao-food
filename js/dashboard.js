@@ -93,6 +93,13 @@ function buildOrderRows(order) {
             <td colspan="6">
                 <div class="order-detail-box">
                     <strong>Chi tiết đơn #${order.order_id}:</strong>
+
+                    <div class="delivery-info">
+                        <p><strong>SĐT:</strong> ${escapeHtml(order.phone || 'Chưa cung cấp')}</p>
+                        <p><strong>Địa chỉ giao hàng:</strong> ${escapeHtml(order.delivery_address || 'Chưa cung cấp')}</p>
+                        <p><strong>Thanh toán:</strong> ${formatPaymentMethod(order.payment_method)} — ${formatPaymentStatus(order.payment_status)}</p>
+                    </div>
+
                     <ul class="detail-item-list">
                         ${order.items.map(item => `
                             <li>
@@ -134,6 +141,15 @@ async function handleStatusUpdate(orderId, nextStatus) {
 // ---------- HELPERS ----------
 function formatCurrency(num) {
     return new Intl.NumberFormat('vi-VN').format(num);
+}
+
+function formatPaymentMethod(method) {
+    const map = { cash: 'Tiền mặt', wallet: 'Ví TaoLao', qr: 'Chuyển khoản QR' };
+    return map[method] || method;
+}
+
+function formatPaymentStatus(status) {
+    return status === 'paid' ? '✅ Đã thanh toán' : '⏳ Chưa thanh toán';
 }
 
 function formatDateTime(dateStr) {
