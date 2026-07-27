@@ -122,6 +122,8 @@
    và tông jade đậm hơn cho "đã giao" (trạng thái kết thúc, tương tự done cũ). */
 .status-outfordelivery { background: #CFE3F2; color: #2D5F8A; }
 .status-delivered      { background: #C7E8D5; color: #1F6B48; }
+/* Fallback khi status trong DB không khớp giá trị nào đã biết (dữ liệu bất thường) */
+.status-unknown        { background: #E0DED9; color: #55524B; }
 
 /* Badge nhỏ hiển thị trạng thái driver (Assigned/En Route/Arrived) cạnh tên tài xế */
 .driver-badge {

@@ -73,7 +73,14 @@ function renderOrders(orders) {
 
 // Xây dựng HTML cho 1 dòng đơn hàng + dòng chi tiết (nếu đang mở rộng)
 function buildOrderRows(order) {
-    const flow = STATUS_FLOW[order.status];
+    // Phòng thủ: nếu status trong DB không khớp với STATUS_FLOW nào (dữ liệu cũ,
+    // lỗi nhập liệu, hoặc chưa migrate) -> không để cả bảng bị crash trắng trang.
+    // Thay vào đó hiển thị badge "unknown" và không cho hành động gì trên dòng đó.
+    const flow = STATUS_FLOW[order.status] || { next: null, label: null, badgeClass: 'status-unknown' };
+    if (!STATUS_FLOW[order.status]) {
+        console.warn(`Đơn #${order.order_id} có status lạ: "${order.status}" - kiểm tra lại dữ liệu trong bảng orders.`);
+    }
+
     const isExpanded = expandedOrderId === String(order.order_id);
 
     const actionButton = flow.next
