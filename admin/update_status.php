@@ -39,12 +39,14 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // ---------- ĐỊNH NGHĨA FSM: các trạng thái hợp lệ & transition được phép ----------
-// Đây là bảng chuyển trạng thái (transition table) của FSM đơn giản.
+// Đã cập nhật theo Module 3 (Delivery Tracking): thêm 2 trạng thái
+// 'Out for Delivery' và 'Delivered', thay cho 'Done' cũ.
 // Key = trạng thái hiện tại, Value = danh sách trạng thái được phép chuyển tới.
 const VALID_TRANSITIONS = [
-    'Pending'   => ['Preparing'],
-    'Preparing' => ['Done'],
-    'Done'      => [], // trạng thái kết thúc (terminal state) - không có transition đi ra
+    'Pending'          => ['Preparing'],
+    'Preparing'        => ['Out for Delivery'],
+    'Out for Delivery' => ['Delivered'],
+    'Delivered'        => [], // trạng thái kết thúc (terminal state) - không có transition đi ra
 ];
 
 $rawInput = file_get_contents('php://input');
@@ -88,7 +90,7 @@ try {
     // Bước 2: Kiểm tra transition có hợp lệ theo FSM không
     // (Đây là "guard condition" đơn giản nhất của FSM: so sánh trạng thái hiện tại
     //  với bảng transition cho phép. Nếu làm eFSM, đây là chỗ thêm điều kiện phụ,
-    //  VD: kiểm tra thêm biến payment_status trước khi cho phép Preparing -> Done.)
+    //  VD: kiểm tra thêm biến payment_status trước khi cho phép Preparing -> Out for Delivery.)
     $allowedNextStates = VALID_TRANSITIONS[$currentStatus] ?? [];
 
     if (!in_array($newStatus, $allowedNextStates, true)) {
@@ -102,6 +104,59 @@ try {
     }
 
     // Bước 3: Thực hiện update
+    // Từ đây trở đi là phần eFSM thật sự: một số transition có GUARD CONDITION
+    // (điều kiện phụ ngoài bảng transition) và SIDE EFFECT (thay đổi thêm dữ liệu
+    // liên quan) chứ không chỉ đơn thuần đổi 1 cột status.
+    $pdo->beginTransaction();
+
+    if ($newStatus === 'Out for Delivery') {
+        // GUARD CONDITION: chỉ cho phép Preparing -> Out for Delivery nếu có
+        // driver đang rảnh. Nếu không, transition bị CHẶN dù bảng FSM cho phép về mặt lý thuyết.
+        // FOR UPDATE khóa dòng driver này lại, tránh 2 admin bấm cùng lúc gán trùng 1 driver
+        // cho 2 đơn khác nhau (race condition).
+        $driverStmt = $pdo->prepare("SELECT driver_id FROM drivers WHERE status = 'Idle' LIMIT 1 FOR UPDATE");
+        $driverStmt->execute();
+        $driver = $driverStmt->fetch();
+
+        if (!$driver) {
+            $pdo->rollBack();
+            http_response_code(409);
+            echo json_encode([
+                'success' => false,
+                'message' => 'Không thể chuyển sang Out for Delivery: không còn tài xế rảnh.',
+            ]);
+            exit;
+        }
+
+        // SIDE EFFECT: tạo bản ghi tracking cho Module 3 (Delivery Tracking Simulation)
+        $pdo->prepare("
+            INSERT INTO delivery_tracking
+                (order_id, driver_id, origin_x, origin_y, destination_x, destination_y,
+                 start_time, estimated_duration_seconds, status)
+            VALUES
+                (:oid, :did, 10, 10, 90, 90, NOW(), 60, 'Assigned')
+        ")->execute(['oid' => $orderId, 'did' => $driver['driver_id']]);
+
+        $pdo->prepare("UPDATE drivers SET status = 'Assigned' WHERE driver_id = :id")
+            ->execute(['id' => $driver['driver_id']]);
+    }
+
+    if ($newStatus === 'Delivered') {
+        // SIDE EFFECT: cho phép admin override thủ công (VD: driver báo giao xong
+        // ngoài đời nhưng canvas mô phỏng chưa kịp chạy hết 60 giây). Đồng bộ lại
+        // delivery_tracking và trả driver về Idle để không bị "kẹt" ở Assigned.
+        $trackStmt = $pdo->prepare("SELECT driver_id FROM delivery_tracking WHERE order_id = :oid");
+        $trackStmt->execute(['oid' => $orderId]);
+        $track = $trackStmt->fetch();
+
+        if ($track) {
+            $pdo->prepare("UPDATE delivery_tracking SET status = 'Arrived' WHERE order_id = :oid")
+                ->execute(['oid' => $orderId]);
+            $pdo->prepare("UPDATE drivers SET status = 'Idle' WHERE driver_id = :id")
+                ->execute(['id' => $track['driver_id']]);
+        }
+    }
+
     $stmtUpdate = $pdo->prepare(
         "UPDATE orders SET status = :new_status WHERE order_id = :order_id"
     );
@@ -109,6 +164,8 @@ try {
         'new_status' => $newStatus,
         'order_id'   => $orderId,
     ]);
+
+    $pdo->commit();
 
     echo json_encode([
         'success' => true,
@@ -118,6 +175,9 @@ try {
     ]);
 
 } catch (PDOException $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
     error_log($e->getMessage());
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Lỗi khi cập nhật trạng thái.']);

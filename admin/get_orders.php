@@ -14,11 +14,17 @@ require_role_api('admin');
 try {
     // Bước 1: Lấy danh sách đơn hàng (bảng cha), kèm thông tin giao hàng & thanh toán,
     // mới nhất lên đầu
+    // Thêm LEFT JOIN drivers/delivery_tracking (Module 3) để dashboard biết đơn nào
+    // đã có tài xế và tài xế đang ở trạng thái nào. Dùng LEFT JOIN vì phần lớn đơn
+    // (Pending/Preparing) sẽ chưa có dòng delivery_tracking tương ứng.
     $stmtOrders = $pdo->prepare(
-        "SELECT order_id, customer_name, phone, delivery_address, total_price, status, 
-                payment_method, payment_status, created_at 
-         FROM orders 
-         ORDER BY created_at DESC"
+        "SELECT o.order_id, o.customer_name, o.phone, o.delivery_address, o.total_price, o.status, 
+                o.payment_method, o.payment_status, o.created_at,
+                dr.driver_name, dt.status AS tracking_status
+         FROM orders o
+         LEFT JOIN delivery_tracking dt ON o.order_id = dt.order_id
+         LEFT JOIN drivers dr ON dt.driver_id = dr.driver_id
+         ORDER BY o.created_at DESC"
     );
     $stmtOrders->execute();
     $orders = $stmtOrders->fetchAll();
@@ -65,4 +71,3 @@ try {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Unable to fetch orders.']);
 }
-

@@ -3,10 +3,14 @@
 
 // Mapping FSM: trạng thái hiện tại -> trạng thái kế tiếp (dùng để render đúng nút hành động)
 // Đồng bộ với bảng VALID_TRANSITIONS bên admin/update_status.php
+// Cập nhật: thêm 'Out for Delivery' và 'Delivered' (Module 3 - Delivery Tracking),
+// thay cho 'Done' cũ. Transition Preparing -> Out for Delivery sẽ tự động gán driver
+// ở phía server (update_status.php), không cần xử lý gì thêm ở client.
 const STATUS_FLOW = {
-    'Pending':   { next: 'Preparing', label: 'Xác nhận & Chuẩn bị', badgeClass: 'status-pending' },
-    'Preparing': { next: 'Done',      label: 'Hoàn tất đơn',        badgeClass: 'status-preparing' },
-    'Done':      { next: null,        label: null,                  badgeClass: 'status-done' },
+    'Pending':          { next: 'Preparing',        label: 'Xác nhận & Chuẩn bị',   badgeClass: 'status-pending' },
+    'Preparing':        { next: 'Out for Delivery',  label: 'Gán tài xế & Giao hàng', badgeClass: 'status-preparing' },
+    'Out for Delivery': { next: 'Delivered',         label: 'Xác nhận đã giao',       badgeClass: 'status-outfordelivery' },
+    'Delivered':        { next: null,                label: null,                     badgeClass: 'status-delivered' },
 };
 
 const REFRESH_INTERVAL_MS = 15000; // tự động refresh mỗi 15s (đáp ứng "real-time or refreshed table")
@@ -34,7 +38,7 @@ async function loadOrders() {
 
 function renderError() {
     document.getElementById('orders-tbody').innerHTML =
-        '<tr><td colspan="6" class="error-row">Lỗi kết nối đến server.</td></tr>';
+        '<tr><td colspan="7" class="error-row">Lỗi kết nối đến server.</td></tr>';
 }
 
 // ---------- 2. RENDER BẢNG ĐƠN HÀNG ----------
@@ -42,7 +46,7 @@ function renderOrders(orders) {
     const tbody = document.getElementById('orders-tbody');
 
     if (orders.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="empty-row">Chưa có đơn hàng nào.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-row">Chưa có đơn hàng nào.</td></tr>';
         return;
     }
 
@@ -76,6 +80,11 @@ function buildOrderRows(order) {
         ? `<button class="action-btn" data-order-id="${order.order_id}" data-next-status="${flow.next}">${flow.label}</button>`
         : `<span class="done-label">Đã hoàn tất</span>`;
 
+    // Cột tài xế (Module 3): chỉ có giá trị sau khi đơn chuyển sang 'Out for Delivery'
+    const driverCell = order.driver_name
+        ? `${escapeHtml(order.driver_name)} <span class="driver-badge">${escapeHtml(order.tracking_status)}</span>`
+        : `<span class="text-muted">Chưa gán</span>`;
+
     const mainRow = `
         <tr class="order-row ${isExpanded ? 'row-expanded' : ''}" data-order-id="${order.order_id}">
             <td>#${order.order_id}</td>
@@ -83,6 +92,7 @@ function buildOrderRows(order) {
             <td class="price-cell">${formatCurrency(order.total_price)} đ</td>
             <td><span class="status-badge ${flow.badgeClass}">${escapeHtml(order.status)}</span></td>
             <td class="time-cell">${formatDateTime(order.created_at)}</td>
+            <td class="driver-cell">${driverCell}</td>
             <td>${actionButton}</td>
         </tr>
     `;
@@ -90,7 +100,7 @@ function buildOrderRows(order) {
     // Dòng chi tiết món ăn - chỉ render khi đơn hàng đang được mở rộng (REQ-2.2)
     const detailRow = isExpanded ? `
         <tr class="detail-row">
-            <td colspan="6">
+            <td colspan="7">
                 <div class="order-detail-box">
                     <strong>Chi tiết đơn #${order.order_id}:</strong>
 

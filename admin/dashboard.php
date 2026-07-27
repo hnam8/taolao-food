@@ -36,11 +36,12 @@ $currentAdmin = current_user();
                     <th>Tổng tiền</th>
                     <th>Trạng thái</th>
                     <th>Thời gian</th>
+                    <th>Tài xế</th>
                     <th>Hành động</th>
                 </tr>
             </thead>
             <tbody id="orders-tbody">
-                <tr><td colspan="6" class="loading-row">Đang tải đơn hàng...</td></tr>
+                <tr><td colspan="7" class="loading-row">Đang tải đơn hàng...</td></tr>
             </tbody>
         </table>
     </main>

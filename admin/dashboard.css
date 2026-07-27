@@ -1,4 +1,3 @@
-
 /* =========================================================
    admin/dashboard.css — Restaurant Management Dashboard
    Kế thừa CSS variables từ ../css/style.css (đã được @import trước)
@@ -118,190 +117,31 @@
 .status-preparing { background: #F2D9A8; color: var(--color-lacquer-dark); }
 .status-done      { background: #DCEEE5; color: var(--color-jade); }
 
-/* ---------- ACTION BUTTON ---------- */
-.action-btn {
-    padding: 0.45rem 0.8rem;
-    background: var(--color-lacquer);
-    color: #fff;
-    font-weight: 700;
-    font-size: 0.8rem;
-    border-radius: 6px;
-    white-space: nowrap;
-    transition: background 0.15s ease;
-}
-.action-btn:hover { background: var(--color-lacquer-dark); }
+/* Module 3 - Delivery Tracking: 2 trạng thái mới thay cho 'Done' cũ.
+   Dùng tông xanh dương nhạt cho "đang giao" (gợi cảm giác di chuyển),
+   và tông jade đậm hơn cho "đã giao" (trạng thái kết thúc, tương tự done cũ). */
+.status-outfordelivery { background: #CFE3F2; color: #2D5F8A; }
+.status-delivered      { background: #C7E8D5; color: #1F6B48; }
 
-.done-label {
-    font-size: 0.8rem;
-    color: var(--color-jade);
-    font-weight: 700;
-}
-
-/* ---------- DETAIL ROW (mở rộng chi tiết món) ---------- */
-.detail-row td {
-    padding: 0;
-    background: transparent;
-}
-
-.order-detail-box {
-    background: #FFF9EF;
-    color: var(--color-ink);
-    padding: 1rem 1.3rem;
-    margin: -0.3rem 0 0.4rem;
-    border-radius: 0 0 8px 8px;
-    border-top: 1px dashed #D9CDB8;
-    font-size: 0.88rem;
-}
-
-.detail-item-list {
-    list-style: none;
-    margin-top: 0.5rem;
-}
-
-.detail-item-list li {
-    display: flex;
-    justify-content: space-between;
-    padding: 0.3rem 0;
-    border-bottom: 1px dotted #D9CDB8;
-}
-.detail-item-list li:last-child { border-bottom: none; }
-
-/* ---------- RESPONSIVE (NFR-3) ---------- */
-@media (max-width: 720px) {
-    .orders-table thead { display: none; }
-
-    .order-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.3rem 0.6rem;
-        padding: 0.6rem;
-    }
-
-    .order-row td {
-        padding: 0.15rem 0.3rem;
-        border-radius: 0 !important;
-    }
-
-    .time-cell { grid-column: 1 / -1; }
-
-/* =========================================================
-   admin/dashboard.css — Restaurant Management Dashboard
-   Kế thừa CSS variables từ ../css/style.css (đã được @import trước)
-   ========================================================= */
-
-.dashboard-body {
-    background-color: var(--color-charcoal);
-    min-height: 100vh;
-}
-
-/* ---------- HEADER ---------- */
-.dashboard-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.5rem 2rem;
-    background: var(--color-charcoal-alt);
-    border-bottom: 3px solid var(--color-lacquer);
-}
-
-.dashboard-header h1 {
-    font-family: var(--font-display);
-    font-weight: 800;
-    font-size: 1.5rem;
-    color: var(--color-amber);
-}
-
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-}
-
-.last-updated-text {
-    font-size: 0.8rem;
-    color: var(--color-cream-muted);
-}
-
-.refresh-btn {
-    padding: 0.5rem 0.9rem;
-    background: var(--color-jade);
-    color: #fff;
-    font-weight: 700;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    transition: background 0.15s ease;
-}
-.refresh-btn:hover { background: #326654; }
-
-/* ---------- TABLE CONTAINER ---------- */
-.dashboard-container {
-    max-width: 1100px;
-    margin: 2rem auto;
-    padding: 0 1.5rem 3rem;
-}
-
-.orders-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0 0.5rem;
-}
-
-.orders-table thead th {
-    text-align: left;
-    padding: 0.6rem 0.9rem;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--color-cream-muted);
-}
-
-/* ---------- ROWS ---------- */
-.order-row {
-    background: var(--color-paper);
-    color: var(--color-ink);
-    cursor: pointer;
-    transition: background 0.15s ease;
-}
-
-.order-row td {
-    padding: 0.85rem 0.9rem;
-}
-
-.order-row td:first-child { border-radius: 8px 0 0 8px; }
-.order-row td:last-child  { border-radius: 0 8px 8px 0; }
-
-.order-row:hover { background: var(--color-paper-dim); }
-
-.order-row.row-expanded {
-    background: #FFF9EF;
-    box-shadow: 0 0 0 2px var(--color-amber) inset;
-}
-
-.price-cell { font-weight: 700; color: var(--color-lacquer-dark); }
-.time-cell { font-size: 0.82rem; color: #6b5f52; }
-
-.loading-row, .error-row, .empty-row {
-    text-align: center;
-    color: var(--color-cream-muted);
-    padding: 2rem 0;
-    background: transparent;
-}
-.error-row { color: #E8968A; }
-
-/* ---------- STATUS BADGES ---------- */
-.status-badge {
+/* Badge nhỏ hiển thị trạng thái driver (Assigned/En Route/Arrived) cạnh tên tài xế */
+.driver-badge {
     display: inline-block;
-    padding: 0.25rem 0.65rem;
-    border-radius: 999px;
-    font-size: 0.78rem;
+    font-size: 0.7rem;
     font-weight: 700;
+    background: var(--color-charcoal-alt);
+    color: var(--color-cream-muted);
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    margin-left: 0.35rem;
+    white-space: nowrap;
 }
 
-.status-pending   { background: #F4E0C4; color: #8A5A1E; }
-.status-preparing { background: #F2D9A8; color: var(--color-lacquer-dark); }
-.status-done      { background: #DCEEE5; color: var(--color-jade); }
+/* Dùng khi đơn chưa được gán tài xế */
+.text-muted {
+    color: var(--color-cream-muted);
+    font-style: italic;
+    font-size: 0.85rem;
+}
 
 /* ---------- ACTION BUTTON ---------- */
 .action-btn {
@@ -350,25 +190,6 @@
     border-bottom: 1px dotted #D9CDB8;
 }
 .detail-item-list li:last-child { border-bottom: none; }
-
-/* ---------- RESPONSIVE (NFR-3) ---------- */
-@media (max-width: 720px) {
-    .orders-table thead { display: none; }
-
-    .order-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.3rem 0.6rem;
-        padding: 0.6rem;
-    }
-
-    .order-row td {
-        padding: 0.15rem 0.3rem;
-        border-radius: 0 !important;
-    }
-
-    .time-cell { grid-column: 1 / -1; }
-}
 
 .delivery-info {
     margin: 0.6rem 0 0.8rem;
@@ -381,4 +202,23 @@
     margin: 0.15rem 0;
     color: #4A3E32;
 }
+
+/* ---------- RESPONSIVE (NFR-3) ---------- */
+@media (max-width: 720px) {
+    .orders-table thead { display: none; }
+
+    .order-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.3rem 0.6rem;
+        padding: 0.6rem;
+    }
+
+    .order-row td {
+        padding: 0.15rem 0.3rem;
+        border-radius: 0 !important;
+    }
+
+    .time-cell { grid-column: 1 / -1; }
+    .driver-cell { grid-column: 1 / -1; }
 }
