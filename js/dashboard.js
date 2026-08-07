@@ -52,8 +52,18 @@ function renderOrders(orders) {
 
     tbody.innerHTML = orders.map(order => buildOrderRows(order)).join('');
 
+    // BUG FIX: trước đây dùng document.querySelectorAll('.action-btn') và
+    // document.querySelectorAll('.order-row') - tìm trên TOÀN TRANG, không chỉ
+    // trong bảng đơn hàng. Vì class "action-btn" bị dùng chung cho cả nút "Lưu"
+    // trong form Menu, "+ Thêm danh mục", "+ Thêm món mới" (xem dashboard.php),
+    // mỗi lần loadOrders() chạy lại (kể cả setInterval 15s) sẽ gắn THÊM 1 listener
+    // click mới vào các nút đó -> bấm "Lưu" ở tab Menu vô tình gọi luôn
+    // handleStatusUpdate(undefined, undefined) -> POST update_status.php với
+    // order_id rỗng -> alert "Mã đơn hàng không hợp lệ." dù không liên quan gì
+    // đến đơn hàng. Sửa bằng cách giới hạn querySelectorAll chỉ trong tbody.
+
     // Gắn sự kiện: click vào hàng đơn hàng -> mở rộng chi tiết (REQ-2.2)
-    document.querySelectorAll('.order-row').forEach(row => {
+    tbody.querySelectorAll('.order-row').forEach(row => {
         row.addEventListener('click', (e) => {
             if (e.target.closest('.action-btn')) return; // không mở rộng khi bấm nút hành động
             const orderId = row.dataset.orderId;
@@ -62,8 +72,8 @@ function renderOrders(orders) {
         });
     });
 
-    // Gắn sự kiện cho nút chuyển trạng thái (REQ-2.3)
-    document.querySelectorAll('.action-btn').forEach(btn => {
+    // Gắn sự kiện cho nút chuyển trạng thái (REQ-2.3) - CHỈ trong phạm vi tbody
+    tbody.querySelectorAll('.action-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
             handleStatusUpdate(btn.dataset.orderId, btn.dataset.nextStatus);
@@ -183,6 +193,7 @@ function escapeHtml(str) {
 // ---------- INIT ----------
 document.addEventListener('DOMContentLoaded', () => {
     loadOrders();
-    document.getElementById('refresh-btn').addEventListener('click', loadOrders);
+    // Nút "Làm mới" giờ được gắn sự kiện tập trung ở js/tabs.js (refreshCurrentTab)
+    // để nhận biết tab nào đang mở, thay vì gắn cứng loadOrders ở đây như trước.
     setInterval(loadOrders, REFRESH_INTERVAL_MS);
 });

@@ -13,6 +13,8 @@ $loggedInUser = current_user();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TaoLao Food - Đặt món trực tuyến</title>
     <link rel="stylesheet" href="css/style.css?v=1.1">
+    <link rel="stylesheet" href="css/menu-filter.css?v=2">
+    <link rel="stylesheet" href="css/track-order.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
@@ -34,6 +36,15 @@ $loggedInUser = current_user();
         <!-- Danh sách món ăn sẽ được JS render vào đây sau khi fetch từ get_menu.php -->
         <section id="menu-section">
             <h2>Thực đơn hôm nay</h2>
+
+            <!-- Filter tìm kiếm + lọc theo danh mục -->
+            <div class="menu-filter-bar">
+                <input type="text" id="menu-search" placeholder="🔍 Tìm món ăn..." maxlength="100">
+                <select id="menu-category-filter">
+                    <option value="">Tất cả danh mục</option>
+                </select>
+            </div>
+
             <div id="menu-list" class="menu-grid">
                 <p class="loading-text">Đang tải thực đơn...</p>
             </div>
@@ -88,11 +99,27 @@ $loggedInUser = current_user();
         </aside>
     </main>
 
+    <section id="my-orders-section" class="container my-orders-section">
+        <h2>Đơn hàng của tôi</h2>
+        <p class="track-order-hint">
+            Các đơn bạn đã đặt trên <strong>trình duyệt này</strong>. Trạng thái tự động cập nhật mỗi vài giây.
+        </p>
+
+        <div id="tracked-orders-list">
+            <p class="loading-text">Đang tải danh sách đơn hàng...</p>
+        </div>
+
+        <div id="no-orders-message" class="hidden">
+            <p>Bạn chưa có đơn hàng nào được lưu trên trình duyệt này. Đặt món ở trên để bắt đầu nhé!</p>
+        </div>
+    </section>
+
     <footer class="site-footer">
     <p>&copy; 2026 TaoLao Food - BTEC Unit 7 Prototype</p>
     <p><a href="admin/dashboard.php" style="color: var(--color-amber);">→ Trang quản lý nhà hàng (Admin)</a></p>
 </footer>
 
     <script src="js/cart.js"></script>
+    <script src="js/track-order.js"></script>
 </body>
 </html>

@@ -6,10 +6,18 @@
 let cart = {};
 
 // ---------- 1. TẢI MENU TỪ SERVER ----------
-async function loadMenu() {
+// Nhận thêm filter (search, category_id) - truyền lên get_menu.php qua query string.
+// Gọi lại mỗi khi người dùng gõ tìm kiếm hoặc đổi danh mục (xem phần INIT bên dưới).
+async function loadMenu(filters = {}) {
     const menuListEl = document.getElementById('menu-list');
+    menuListEl.innerHTML = '<p class="loading-text">Đang tải thực đơn...</p>';
+
+    const params = new URLSearchParams();
+    if (filters.search) params.set('search', filters.search);
+    if (filters.categoryId) params.set('category_id', filters.categoryId);
+
     try {
-        const response = await fetch('api/get_menu.php');
+        const response = await fetch(`api/get_menu.php?${params.toString()}`);
         const result = await response.json();
 
         if (!result.success) {
@@ -22,6 +30,31 @@ async function loadMenu() {
         console.error('Lỗi khi tải menu:', err);
         menuListEl.innerHTML = '<p class="error-text">Lỗi kết nối đến server.</p>';
     }
+}
+
+// Tải danh sách danh mục cho dropdown filter (gọi 1 lần khi trang load)
+async function loadCategoriesForFilter() {
+    const select = document.getElementById('menu-category-filter');
+    try {
+        const response = await fetch('api/get_categories.php');
+        const result = await response.json();
+        if (!result.success) return;
+
+        const options = result.data
+            .map(cat => `<option value="${cat.category_id}">${escapeHtml(cat.category_name)} (${cat.item_count})</option>`)
+            .join('');
+        select.innerHTML = '<option value="">Tất cả danh mục</option>' + options;
+    } catch (err) {
+        console.error('Lỗi khi tải danh mục:', err);
+        // Không chặn trang nếu lỗi - dropdown chỉ còn mỗi "Tất cả danh mục", vẫn dùng được
+    }
+}
+
+// Đọc giá trị filter hiện tại từ 2 ô input/select rồi gọi lại loadMenu()
+function applyMenuFilters() {
+    const search = document.getElementById('menu-search').value.trim();
+    const categoryId = document.getElementById('menu-category-filter').value;
+    loadMenu({ search, categoryId });
 }
 
 // ---------- 2. RENDER MENU RA DOM ----------
@@ -178,6 +211,14 @@ async function handleCheckout() {
 
         messageEl.textContent = `Đặt hàng thành công! Mã đơn: #${result.order_id}`;
         messageEl.className = 'success-text';
+        saveOrderIdToLocalStorage(result.order_id);
+
+        // Cập nhật ngay section "Đơn hàng của tôi" (track-order.js) nếu có trên trang,
+        // thay vì đợi chu kỳ polling 8s tiếp theo mới thấy đơn vừa đặt.
+        if (typeof refreshTrackedOrders === 'function') {
+            refreshTrackedOrders();
+        }
+
         cart = {};
         renderCart();
         phoneInput.value = '';
@@ -190,6 +231,23 @@ async function handleCheckout() {
         console.error('Lỗi khi đặt hàng:', err);
         messageEl.textContent = 'Lỗi kết nối đến server.';
         messageEl.className = 'error-text';
+    }
+}
+
+// Lưu order_id vào localStorage để trang track-order.php đọc lại được sau này
+// (key STORAGE_KEY phải khớp với hằng số dùng trong js/track-order.js)
+const GUEST_ORDERS_STORAGE_KEY = 'taolao_guest_orders';
+function saveOrderIdToLocalStorage(orderId) {
+    try {
+        const raw = localStorage.getItem(GUEST_ORDERS_STORAGE_KEY);
+        const savedIds = raw ? JSON.parse(raw) : [];
+        savedIds.push(orderId);
+        // Giới hạn tối đa 30 đơn gần nhất để localStorage không phình to
+        const trimmed = [...new Set(savedIds)].slice(-30);
+        localStorage.setItem(GUEST_ORDERS_STORAGE_KEY, JSON.stringify(trimmed));
+    } catch (err) {
+        console.error('Lỗi khi lưu order_id vào localStorage:', err);
+        // Không chặn luồng đặt hàng nếu localStorage lỗi (vd: private browsing)
     }
 }
 
@@ -240,5 +298,17 @@ function escapeHtml(str) {
 // ---------- INIT ----------
 document.addEventListener('DOMContentLoaded', () => {
     loadMenu();
+    loadCategoriesForFilter();
     document.getElementById('checkout-btn').addEventListener('click', handleCheckout);
+
+    // Debounce ô tìm kiếm 300ms - tránh gọi API mỗi lần gõ 1 ký tự (mỗi lần gõ
+    // xong 1 từ mới gọi, không phải mỗi phím bấm), giảm tải server đáng kể.
+    let searchDebounceTimer = null;
+    document.getElementById('menu-search').addEventListener('input', () => {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(applyMenuFilters, 300);
+    });
+
+    // Đổi danh mục thì lọc lại ngay, không cần debounce (chỉ đổi khi click, không gõ liên tục)
+    document.getElementById('menu-category-filter').addEventListener('change', applyMenuFilters);
 });

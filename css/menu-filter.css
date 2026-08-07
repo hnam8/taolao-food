@@ -1,0 +1,48 @@
+/* css/menu-filter.css
+   Style cho thanh filter (tìm kiếm + lọc danh mục) ở trang order.
+   Đồng bộ chính xác với style input đã có sẵn ở .checkout-form input
+   trong style.css (cùng border-color #C9BCAA, cùng border-radius, cùng nền trắng). */
+
+.menu-filter-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin: -0.5rem 0 1.75rem; /* kéo nhẹ lên gần tiêu đề "Thực đơn hôm nay" hơn */
+}
+
+#menu-search,
+#menu-category-filter {
+    padding: 0.85rem 1.1rem;
+    border: 1px solid #C9BCAA;
+    border-radius: 8px;
+    background: #fff;
+    font-family: inherit;
+    font-size: 1.05rem;
+    color: var(--color-ink);
+}
+
+#menu-search {
+    flex: 1;
+    min-width: 220px;
+}
+
+#menu-category-filter {
+    min-width: 180px;
+    cursor: pointer;
+}
+
+#menu-search:focus-visible,
+#menu-category-filter:focus-visible {
+    outline: 3px solid var(--color-amber);
+    outline-offset: 2px;
+}
+
+@media (max-width: 480px) {
+    .menu-filter-bar {
+        flex-direction: column;
+    }
+    #menu-search, #menu-category-filter {
+        width: 100%;
+        min-width: 0;
+    }
+}

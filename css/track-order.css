@@ -1,0 +1,142 @@
+/* css/track-order.css
+   Style cho trang Guest tra cứu trạng thái đơn hàng.
+   Dùng lại CSS variables đã khai báo trong style.css:
+   --color-charcoal, --color-amber, --color-lacquer, --color-jade,
+   --color-paper, --color-ink, --color-cream-muted
+*/
+
+#track-order-section {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Khi nhúng section "Đơn hàng của tôi" trực tiếp vào index.php (không phải trang track-order.php riêng) */
+.my-orders-section {
+    margin-top: 2.5rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.my-orders-section h2 {
+    margin-bottom: 0.5rem;
+}
+
+.track-order-hint {
+    color: var(--color-cream-muted, #b8ac9d);
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
+.tracked-order-card {
+    background: var(--color-charcoal, #2a2422);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.tracked-order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.4rem;
+}
+
+.tracked-order-header strong {
+    color: var(--color-paper, #f5efe6);
+    font-size: 1.05rem;
+}
+
+.tracked-order-total {
+    color: var(--color-amber, #d9a441);
+    font-weight: 600;
+}
+
+.tracked-order-time {
+    color: var(--color-cream-muted, #b8ac9d);
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.status-delivered-text {
+    color: var(--color-jade, #4a8b6f);
+    font-weight: 600;
+}
+
+/* ---------- Progress bar theo FSM: Pending -> Preparing -> Out for Delivery -> Delivered ---------- */
+.status-progress-bar {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    margin-top: 0.5rem;
+}
+
+.status-progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.15);
+    z-index: 0;
+}
+
+.progress-step {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.progress-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-charcoal, #2a2422);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    margin-bottom: 0.4rem;
+    transition: all 0.2s ease;
+}
+
+.progress-label {
+    font-size: 0.75rem;
+    color: var(--color-cream-muted, #b8ac9d);
+}
+
+.progress-step.done .progress-dot {
+    background: var(--color-jade, #4a8b6f);
+    border-color: var(--color-jade, #4a8b6f);
+}
+.progress-step.done .progress-label {
+    color: var(--color-jade, #4a8b6f);
+}
+
+.progress-step.active .progress-dot {
+    background: var(--color-amber, #d9a441);
+    border-color: var(--color-amber, #d9a441);
+    box-shadow: 0 0 0 4px rgba(217, 164, 65, 0.2);
+}
+.progress-step.active .progress-label {
+    color: var(--color-amber, #d9a441);
+    font-weight: 600;
+}
+
+#no-orders-message {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--color-cream-muted, #b8ac9d);
+}
+
+.back-to-menu-link {
+    display: inline-block;
+    margin-top: 0.75rem;
+    color: var(--color-amber, #d9a441);
+}
+
+.hidden {
+    display: none !important;
+}

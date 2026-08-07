@@ -129,13 +129,25 @@ try {
         }
 
         // SIDE EFFECT: tạo bản ghi tracking cho Module 3 (Delivery Tracking Simulation)
+        // Random tọa độ trong khoảng góc-nhà-hàng / góc-khách-hàng thay vì hardcode
+        // cố định 1 cặp tọa độ - nếu không, khi nhiều tài xế cùng giao 1 lúc, mọi
+        // chấm sẽ chồng lên đúng 1 đường thẳng trên bản đồ admin (tab Tài xế),
+        // nhìn không phân biệt được đơn nào với đơn nào.
+        $originX = random_int(5, 20);
+        $originY = random_int(5, 20);
+        $destX = random_int(80, 95);
+        $destY = random_int(80, 95);
+
         $pdo->prepare("
             INSERT INTO delivery_tracking
                 (order_id, driver_id, origin_x, origin_y, destination_x, destination_y,
                  start_time, estimated_duration_seconds, status)
             VALUES
-                (:oid, :did, 10, 10, 90, 90, NOW(), 60, 'Assigned')
-        ")->execute(['oid' => $orderId, 'did' => $driver['driver_id']]);
+                (:oid, :did, :ox, :oy, :dx, :dy, NOW(), 60, 'Assigned')
+        ")->execute([
+            'oid' => $orderId, 'did' => $driver['driver_id'],
+            'ox' => $originX, 'oy' => $originY, 'dx' => $destX, 'dy' => $destY,
+        ]);
 
         $pdo->prepare("UPDATE drivers SET status = 'Assigned' WHERE driver_id = :id")
             ->execute(['id' => $driver['driver_id']]);

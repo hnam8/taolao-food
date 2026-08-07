@@ -224,3 +224,63 @@
     .time-cell { grid-column: 1 / -1; }
     .driver-cell { grid-column: 1 / -1; }
 }
+
+/* =========================================================
+   TAB SYSTEM - Dashboard gộp (Đơn hàng / Tài xế / Menu / Analytics)
+   ========================================================= */
+
+.dashboard-header {
+    flex-direction: column;
+    align-items: stretch;
+}
+.dashboard-header h1 { margin-bottom: 0.6rem; }
+
+.tab-nav {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.6rem;
+}
+
+.tab-btn {
+    padding: 0.5rem 1rem;
+    background: transparent;
+    color: var(--color-cream-muted);
+    border: 1px solid #4a4038;
+    border-radius: 8px 8px 0 0;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+.tab-btn:hover { background: var(--color-charcoal); }
+.tab-btn.active {
+    background: var(--color-lacquer);
+    color: #fff;
+    border-color: var(--color-lacquer);
+}
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ---------- TAB TÀI XẾ ---------- */
+.driver-tab-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    align-items: start;
+}
+
+#driverMapCanvas {
+    width: 100%;
+    height: auto;
+    background: #eafaf1;
+    border: 2px solid var(--color-jade);
+    border-radius: 8px;
+}
+
+@media (max-width: 900px) {
+    .driver-tab-layout {
+        grid-template-columns: 1fr;
+    }
+}
