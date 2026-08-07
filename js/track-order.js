@@ -3,7 +3,17 @@
 // Đọc danh sách order_id đã lưu trong localStorage (do cart.js ghi vào lúc checkout),
 // gọi api/get_order_status.php để lấy trạng thái mới nhất, và AJAX polling định kỳ.
 
-const STORAGE_KEY = 'taolao_guest_orders'; // phải khớp với key dùng trong cart.js
+// BUG FIX: trước đây STORAGE_KEY cố định 'taolao_guest_orders' cho MỌI người
+// dùng chung 1 trình duyệt -> đăng nhập tài khoản khác vẫn thấy lịch sử đơn
+// của tài khoản cũ, vì localStorage lưu theo trình duyệt chứ không tự biết
+// ai đang đăng nhập. Sửa bằng cách tính key ĐỘNG theo user_id hiện tại
+// (window.TAOLAO_CURRENT_USER_ID do index.php truyền sang qua inline script).
+// Guest (chưa đăng nhập, TAOLAO_CURRENT_USER_ID = null) vẫn dùng chung 1 key
+// như cũ - đúng tinh thần ban đầu của tính năng này.
+function getOrdersStorageKey() {
+    const userId = window.TAOLAO_CURRENT_USER_ID;
+    return userId ? `taolao_orders_user_${userId}` : 'taolao_guest_orders';
+}
 
 // Thứ tự các trạng thái theo FSM của hệ thống (khớp update_status.php phía Admin)
 const STATUS_FLOW = ['Pending', 'Preparing', 'Out for Delivery', 'Delivered'];
@@ -20,7 +30,7 @@ let pollTimer = null;
 // ---------- 1. ĐỌC DANH SÁCH ORDER_ID TỪ LOCALSTORAGE ----------
 function getSavedOrderIds() {
     try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = localStorage.getItem(getOrdersStorageKey());
         if (!raw) return [];
         const parsed = JSON.parse(raw);
         // Chỉ giữ lại các số nguyên dương hợp lệ, loại trùng

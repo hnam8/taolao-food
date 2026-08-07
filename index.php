@@ -119,6 +119,13 @@ $loggedInUser = current_user();
     <p><a href="admin/dashboard.php" style="color: var(--color-amber);">→ Trang quản lý nhà hàng (Admin)</a></p>
 </footer>
 
+    <script>
+        // Truyền định danh tài khoản đang đăng nhập (nếu có) từ PHP sang JS.
+        // Dùng để tách riêng key localStorage theo từng tài khoản, tránh tình
+        // trạng đăng nhập tài khoản khác vẫn thấy lịch sử đơn của tài khoản cũ
+        // (localStorage vốn lưu theo trình duyệt, không tự biết ai đang đăng nhập).
+        window.TAOLAO_CURRENT_USER_ID = <?= $loggedInUser ? (int)$loggedInUser['user_id'] : 'null' ?>;
+    </script>
     <script src="js/cart.js"></script>
     <script src="js/track-order.js"></script>
 </body>

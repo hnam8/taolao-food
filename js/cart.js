@@ -234,17 +234,23 @@ async function handleCheckout() {
     }
 }
 
-// Lưu order_id vào localStorage để trang track-order.php đọc lại được sau này
-// (key STORAGE_KEY phải khớp với hằng số dùng trong js/track-order.js)
-const GUEST_ORDERS_STORAGE_KEY = 'taolao_guest_orders';
+// Lưu order_id vào localStorage để trang track-order.php / section "Đơn hàng của tôi" đọc lại được.
+// BUG FIX: trước đây key cố định 'taolao_guest_orders' cho MỌI tài khoản dùng
+// chung trình duyệt -> đổi tài khoản vẫn thấy đơn của tài khoản cũ. Giờ dùng
+// hàm getOrdersStorageKey() (định nghĩa trong track-order.js, cùng load trên
+// trang) để tính key riêng theo user_id đang đăng nhập.
 function saveOrderIdToLocalStorage(orderId) {
     try {
-        const raw = localStorage.getItem(GUEST_ORDERS_STORAGE_KEY);
+        // Phòng trường hợp track-order.js chưa kịp load (thứ tự script) - key mặc định Guest
+        const storageKey = typeof getOrdersStorageKey === 'function'
+            ? getOrdersStorageKey()
+            : 'taolao_guest_orders';
+        const raw = localStorage.getItem(storageKey);
         const savedIds = raw ? JSON.parse(raw) : [];
         savedIds.push(orderId);
         // Giới hạn tối đa 30 đơn gần nhất để localStorage không phình to
         const trimmed = [...new Set(savedIds)].slice(-30);
-        localStorage.setItem(GUEST_ORDERS_STORAGE_KEY, JSON.stringify(trimmed));
+        localStorage.setItem(storageKey, JSON.stringify(trimmed));
     } catch (err) {
         console.error('Lỗi khi lưu order_id vào localStorage:', err);
         // Không chặn luồng đặt hàng nếu localStorage lỗi (vd: private browsing)
